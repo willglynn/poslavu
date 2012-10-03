@@ -49,8 +49,8 @@ iterate over all your orders:
     }
 
 Done. This will issue multiple API calls as needed, traversing the list of
-orders one page at a time. Naturally, the resulting object is `Enumerable`,
-so you can call `.map` or `.inject` or whatever other normal things you
+orders one page at a time. Naturally, the resulting object is +Enumerable+,
+so you can call +.map+ or +.inject+ or whatever other normal things you
 might want to do.
 
 Now, say you want a list of orders that have produced 4 checks:
@@ -84,7 +84,7 @@ data model.
 
 Running the live component of the test suite requires POSLavu API credentials.
 This is safe to run against a live site; it does not modify any data. You can
-pass in your credentials using environment variables or by creating a `.env`
+pass in your credentials using environment variables or by creating a +.env+
 file with the following:
 
     POSLAVU_DATANAME=foobar
@@ -100,7 +100,7 @@ Panel. Once you're ready, say:
 == Contributing
 
 1. Fork it
-2. Create your feature branch (`git checkout -b my-new-feature`)
-3. Commit your changes (`git commit -am 'Added some feature'`)
-4. Push to the branch (`git push origin my-new-feature`)
+2. Create your feature branch (<tt>git checkout -b my-new-feature</tt>)
+3. Commit your changes (<tt>git commit -am 'Added some feature'</tt>)
+4. Push to the branch (<tt>git push origin my-new-feature</tt>)
 5. Create new Pull Request
