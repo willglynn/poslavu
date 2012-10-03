@@ -1,6 +1,6 @@
-# POSLavu
+= POSLavu
 
-[POSLavu](http://www.poslavu.com/) is a hosted point-of-sale system. They
+POSLavu[http://www.poslavu.com/] is a hosted point-of-sale system. They
 provide an API.
 
 The POSLavu API is, franky, disgusting. It feels like something someone might
@@ -15,7 +15,7 @@ access methods.
 
 Naturally, you'll need a POSLavu account to do anything useful.
 
-## Installation
+== Installation
 
 Add this line to your application's Gemfile:
 
@@ -29,7 +29,7 @@ Or install it yourself as:
 
     $ gem install poslavu
 
-## Usage
+== Usage
 
 All usage starts by instantiating a client object.
 
@@ -69,11 +69,11 @@ It also supports pagination, in case you'd like to handle that yourself:
     client.table('orders').page(2, 50)
     client.table('orders').page(3, 50)
 
-`Client#table` returns a `POSLavu::QueryScope`, which lets you chain various
+Client#table returns a POSLavu::QueryScope, which lets you chain various
 conditions and lazily retrieve the results. Records are encapsulated by
-`POSLavu::Row`, which is just a `Hash` that came from the POSLavu API.
+POSLavu::Row, which is just a Hash that came from the POSLavu API.
 
-## Development
+== Development
 
 POSLavu uses rspec and WebMock to validate functionality.
 
@@ -92,12 +92,12 @@ file with the following:
     POSLAVU_TOKEN=EZcWR0n...
 
 You can determine the proper values in the
-[API tab](http://admin.poslavu.com/cp/index.php?mode=api) of the POSLavu Control
+API[http://admin.poslavu.com/cp/index.php?mode=api] tab of the POSLavu Control
 Panel. Once you're ready, say:
 
     $ bundle exec rake live
 
-## Contributing
+== Contributing
 
 1. Fork it
 2. Create your feature branch (`git checkout -b my-new-feature`)

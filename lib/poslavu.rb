@@ -8,5 +8,5 @@ module POSLavu
 end
 
 # Add some aliases so as to not be picky about capitalization
-POSlavu = POSLavu
-Poslavu = POSLavu
+Object.const_set(:POSlavu, POSLavu)
+Object.const_set(:Poslavu, POSLavu)

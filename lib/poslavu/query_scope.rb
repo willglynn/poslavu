@@ -1,13 +1,38 @@
 require 'multi_json'
 
-# Represents a queryable dataset. Supports chaining.
+# QueryScope represents a retrievable set of records. You can obtain one by
+# calling POSLavu::Client#table() for the table in question.
+#
+# Query scopes are chainable. Given an initial scope representing all records
+# in a table, you may further restrict the records of interest by with #filter,
+# #page, and #where.
+#
+# Query scopes are Enumerable. #each is the obvious access method, but #to_a,
+# #map, #inject, and all your friends are also available.
+#
+# Query scopes are lazy loading. You can manipulate them as much as you want
+# without performing any API calls. The request is actually performed once you
+# call #each or any other Enumerable method. If you've called #page, the results
+# are held in memory. If not, #each issues multiple requests (internally
+# paginating) and does not hold the result in memory.
 class POSLavu::QueryScope
   include Enumerable
   
+  # The name of the table, as passed to POSLavu::Client#table
   attr_reader :table
   
+  # The list of operators supported by the POSLavu API (and thus supported by #filter).
   Operators = ['<=', '>=', '<', '>', '=', '<>', '!=', 'BETWEEN', 'LIKE', 'NOT LIKE']
   
+  # Returns a new QueryScope with the specified filter applied.
+  #
+  # The POSLavu API has a basic query language modeled after SQL, probably because
+  # they're shoveling the filter straight into SQL. It supports restricting +field+s
+  # using a set of Operators. All of them require a value for comparison, except
+  # +BETWEEN+, which requires two values.
+  #
+  # +LIKE+ and +NOT LIKE+ accept +'%'+ as a wildcard. There is no mechanism for
+  # pattern-matching strings containing a percent sign.
   def filter(field, operator, value, value2=nil)
     operator = operator.to_s.upcase
     raise ArgumentError, "invalid operator" unless Operators.include?(operator)
@@ -19,7 +44,9 @@ class POSLavu::QueryScope
     }
   end
   
-  # returns records for a one-indexed page number
+  # Returns a new QueryScope, restricting results to the specified page number.
+  #
+  # Pages are 1-indexed: the first page is page 1, not page 0.
   def page(number, records_per_page=40)
     raise ArgumentError, "the first page number is 1 (got #{number})" if number < 1
     
@@ -29,7 +56,12 @@ class POSLavu::QueryScope
     }
   end
   
-  # Finds records matching the provided hash
+  # Returns a new QueryScope, restricting results to rows matching the specified
+  # hash. It is a convenience method around #filter. The following two statements
+  # are exactly equivalent:
+  #
+  #     client.table('orders').where('table_id' => 4, 'no_of_checks' => 2)
+  #     client.table('orders').filter('table_id', '=', 4).filter('no_of_checks', '=', 2)
   def where(hash)
     scope = self
     hash.each { |key,value|
@@ -38,6 +70,11 @@ class POSLavu::QueryScope
     scope
   end
   
+  # Iterate over the records represented by this query scope.
+  #
+  # If this scope has an explicit #page set, the results will be retrieved and
+  # memoized. Otherwise, this scope will internally paginate and make successive
+  # requests, yielding each row in turn, and the results will not be memoized.
   def each(&block)
     if @rows
       # we've been memoized
@@ -86,6 +123,7 @@ class POSLavu::QueryScope
     self
   end
   
+  #:nodoc:
   protected
   attr_accessor :filters, :start_record, :record_count
   attr_accessor :rows

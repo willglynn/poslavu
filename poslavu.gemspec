@@ -14,6 +14,14 @@ Gem::Specification.new do |gem|
   gem.name          = "poslavu"
   gem.require_paths = ["lib"]
   gem.version       = POSLavu::VERSION
+  
+  gem.rdoc_options  += [
+    '--title', 'POSLavu API Client',
+    '--main', 'README.rdoc',
+    '--exclude', 'spec',
+    '--exclude', 'Gemfile',
+    '--exclude', 'Rakefile'
+    ]
 
   gem.add_dependency "nokogiri", "~> 1.5"
   gem.add_dependency "faraday", "~> 0.8"
