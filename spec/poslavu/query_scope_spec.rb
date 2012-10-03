@@ -62,14 +62,14 @@ describe POSLavu::QueryScope do
       it "memoizes results" do
         subject.each { }
         subject.each { }
-        WebMock.should have_requested_poslavu_api().once
+        WebMock.should have_requested_poslavu_api.once
       end
       
       it "re-requests when chained" do
         subject.each { }
         child = subject.filter('foo', '=', 'bar')
         child.each { }
-        WebMock.should have_requested_poslavu_api().twice
+        WebMock.should have_requested_poslavu_api.twice
       end
       
       it "passes filter as JSON" do
@@ -78,7 +78,32 @@ describe POSLavu::QueryScope do
       end
     end
     
-    describe "for multiple pages" do
+    describe "for all pages when there is only one page" do
+      before {
+        poslavu_api_stub('limit' => '0,100') { (1..50).map { |n| POSLavu::Row.new('counter' => n) } }
+      }
+      
+      subject { table }
+      
+      it "returns all results" do
+        rows = 0
+        subject.each { rows += 1 }
+        rows.should eq 50
+      end
+      
+      it "requests all pages" do
+        subject.each {}
+        WebMock.should have_requested_poslavu_api.once
+      end
+      
+      it "memoizes results" do
+        subject.each {}
+        subject.each {}
+        WebMock.should have_requested_poslavu_api.once
+      end
+    end
+    
+    describe "for all pages when there is more than one" do
       let(:full_page) { (1..100).map { |n| POSLavu::Row.new('counter' => n) } }
       let(:half_page) { full_page[0,50] }
       
@@ -98,13 +123,13 @@ describe POSLavu::QueryScope do
       
       it "requests all pages" do
         subject.each {}
-        WebMock.should have_requested_poslavu_api().times(3)
+        WebMock.should have_requested_poslavu_api.times(3)
       end
       
       it "does not memoize results" do
         subject.each {}
         subject.each {}
-        WebMock.should have_requested_poslavu_api().times(6)
+        WebMock.should have_requested_poslavu_api.times(6)
       end
     end
     

@@ -39,10 +39,16 @@ class POSLavu::QueryScope
   end
   
   def each(&block)
-    if start_record
+    if @rows
+      # we've been memoized
+      @rows.each(&block)
+      
+    elsif start_record
       # we represent a single page
       # do the fetching and iterate
-      fetch_rows.each(&block)
+      @rows = fetch_rows
+
+      @rows.each(&block)
     else
       # we represent the whole set of possible records
       # fetch repeatedly, in pages
@@ -59,8 +65,18 @@ class POSLavu::QueryScope
         # pass them to the caller
         records.each(&block)
         
-        # bail out if we're done
-        break if records.size < records_per_page
+        # is this the last page?
+        if records.size < records_per_page
+          # was this the first page?
+          if page_number == 1
+            # this is the only page
+            # memoize
+            @rows = records
+          end
+          
+          # regardless, we're done
+          break
+        end
         
         page_number += 1
       }
@@ -92,7 +108,7 @@ class POSLavu::QueryScope
   end
   
   def fetch_rows
-    @rows ||= @client.invoke('list', to_params)
+    @client.invoke('list', to_params)
   end
   
   def to_params
