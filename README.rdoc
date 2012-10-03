@@ -1,5 +1,7 @@
 = POSLavu
 
+Github[https://github.com/willglynn/poslavu] {<img src="https://secure.travis-ci.org/willglynn/poslavu.png" alt="Build Status" />}[http://travis-ci.org/willglynn/poslavu] {<img src="https://gemnasium.com/willglynn/poslavu.png" alt="Dependency Status" />}[https://gemnasium.com/willglynn/poslavu]
+
 POSLavu[http://www.poslavu.com/] is a hosted point-of-sale system. They
 provide an API.
 
