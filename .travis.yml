@@ -12,3 +12,6 @@ rvm:
   - ree
 before_install:
   - gem install nokogiri -- --with-cflags='--std=gnu99'
+matrix:
+  allow_failures:
+    - rvm: jruby-head
