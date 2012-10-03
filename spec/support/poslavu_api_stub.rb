@@ -34,8 +34,8 @@ module POSLavu::APIStub
         if actual_filters = params['filters']
           # request has parameter
           # parse both
-          expected = MultiJson.load(expected_filters)
-          actual = MultiJson.load(actual_filters)
+          expected = MultiJson.load(expected_filters).sort_by { |f| f['field'] }
+          actual = MultiJson.load(actual_filters).sort_by { |f| f['field'] }
           
           # compare
           expected == actual
