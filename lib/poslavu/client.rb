@@ -38,13 +38,15 @@ class POSLavu::Client
     elements = fragment.children.select(&:element?)   # .element_children doesn't work
     
     if elements.empty?
-      # this is apparently how errors are signalled
-      if fragment.to_s.empty?
-        raise Error, "empty body returned (#{final_parameters.inspect})"
+      if fragment.to_s.strip.empty?
+        # did we actually get no data?
+        return []
       else
+        # this is apparently how errors are signalled
         raise Error, fragment.to_s
       end
     else
+      # assume all the elements are <row>s, and let Row explode if we're wrong
       elements.map { |element|
         POSLavu::Row.from_nokogiri(element)
       }

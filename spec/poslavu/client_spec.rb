@@ -44,6 +44,12 @@ describe POSLavu::Client do
       before { poslavu_api_stub { response } }
       subject { client.invoke('command') }
       
+      describe "empty string" do
+        let(:response) { "" }
+        it { should be_kind_of Array }
+        it { should be_empty }
+      end
+      
       describe "single row" do
         let(:response) { [POSLavu::Row.new(:foo => 'bar', :baz => 'quxx')] }
         it { should be_kind_of Array }
