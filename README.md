@@ -1,9 +1,19 @@
 # POSLavu
 
 [POSLavu](http://www.poslavu.com/) is a hosted point-of-sale system. They
-provide an API. This gem consumes that API.
+provide an API.
 
-You must have a POSLavu account to do anything useful.
+The POSLavu API is, franky, disgusting. It feels like something someone might
+have come up with their first week using MySQL and PHP. There's POST parameters
+and XML fragments and JSON scattered about. Error handling and input
+sanitization are afterthoughts. There's no direction or cohesiveness. Tell me:
+would *you* expose an "order" table with 91 different columns? POSLavu did.
+
+This gem wraps that API into something that's more reasonable than using their
+API directly. A gem can't fix the data model, but it can add some sanity to the
+access methods.
+
+Naturally, you'll need a POSLavu account to do anything useful.
 
 ## Installation
 
@@ -21,16 +31,71 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+All usage starts by instantiating a client object.
+
+    client = POSLavu::Client.new('dataname', 'token', 'key')
+
+From here, you can invoke API methods directly:
+
+    client.invoke('command', 'parameter' => 'value')
+
+This is the low-level interface. Hopefully you'll never need it.
+
+The POSLavu gem provides a higher-level query interface. Say you want to
+iterate over all your orders:
+
+    client.table('orders').each { |order|
+      # ...
+    }
+
+Done. This will issue multiple API calls as needed, traversing the list of
+orders one page at a time. Naturally, the resulting object is `Enumerable`,
+so you can call `.map` or `.inject` or whatever other normal things you
+might want to do.
+
+Now, say you want a list of orders that have produced 4 checks:
+
+    client.table('orders').where('no_of_checks' => 4).each { |order|
+      # ...
+    }
+
+Or maybe you want to restrict by date:
+
+    client.table('orders').filter('opened', :between, '2012-10-01', '2012-10-02')
+
+It also supports pagination, in case you'd like to handle that yourself:
+
+    client.table('orders').page(1, 50)
+    client.table('orders').page(2, 50)
+    client.table('orders').page(3, 50)
+
+`Client#table` returns a `POSLavu::QueryScope`, which lets you chain various
+conditions and lazily retrieve the results. Records are encapsulated by
+`POSLavu::Row`, which is just a `Hash` that came from the POSLavu API.
 
 ## Development
 
-Running the suite requires POSLavu API credentials. You can pass in your credentials
-using environment variables or by creating a +.env+ file with the following:
+POSLavu uses rspec and WebMock to validate functionality.
+
+There is a component of the test suite that runs read-only queries against
+the live POSLavu API. This is intended as a smoke test, principally exercising
+the RPC mechanism, although it can also identify changes in the server-side
+data model.
+
+Running the live component of the test suite requires POSLavu API credentials.
+This is safe to run against a live site; it does not modify any data. You can
+pass in your credentials using environment variables or by creating a `.env`
+file with the following:
 
     POSLAVU_DATANAME=foobar
     POSLAVU_KEY=q834SCx...
     POSLAVU_TOKEN=EZcWR0n...
+
+You can determine the proper values in the
+[API tab](http://admin.poslavu.com/cp/index.php?mode=api) of the POSLavu Control
+Panel. Once you're ready, say:
+
+    $ bundle exec rake live
 
 ## Contributing
 
