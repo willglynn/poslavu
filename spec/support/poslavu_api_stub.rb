@@ -24,6 +24,30 @@ module POSLavu::APIStub
   end
   
   def have_requested_poslavu_api(params = {})
-    have_requested(:post, POSLavu::Client::URL).with(:body => hash_including(params))
+    expected_filters = params.delete('filters')
+    
+    have_requested(:post, POSLavu::Client::URL).with(:body => hash_including(params)) { |req|
+      if expected_filters
+        # filters is JSON, which needs to be an equivalent data structure
+        params = WebMock::Util::QueryMapper.query_to_values(req.body)
+        
+        if actual_filters = params['filters']
+          # request has parameter
+          # parse both
+          expected = MultiJson.load(expected_filters)
+          actual = MultiJson.load(actual_filters)
+          
+          # compare
+          expected == actual
+        else
+          # request missing parameter; fail
+          false
+        end
+        
+      else
+        # no filters parameter; match
+        true
+      end
+    }
   end
 end
