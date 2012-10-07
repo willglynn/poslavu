@@ -17,6 +17,17 @@ access methods.
 
 Naturally, you'll need a POSLavu account to do anything useful.
 
+== Status
+
+The gem works for basic API calls and querying. I had planned on adding a set
+of ActiveModel-compliant objects on top, but the organization I built this for
+is now giving up on POSLavu, citing stability issues and myriad other pain
+points. As a result, I will not be developing this gem further.
+
+If you're in a position where this gem will be helpful, by all means, use it.
+If it breaks, by all means, fix it and send a pull request. If you'd like to
+take over, let me know; I'm open.
+
 == Installation
 
 Add this line to your application's Gemfile:
